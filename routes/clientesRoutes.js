@@ -75,7 +75,10 @@ module.exports = (db, bcrypt, saltRounds) => {
       }
 
       // Aquí podrías generar un token JWT si estás usando autenticación basada en tokens
-      res.status(200).send('Inicio de sesión exitoso');
+      res.status(200).json({
+        message: 'Inicio de sesión exitoso',
+        nombreCliente: user.nombreCliente,
+      });
     } catch (error) {
       console.error('Error al validar el login:', error);
       res.status(500).send('Error al validar el login');

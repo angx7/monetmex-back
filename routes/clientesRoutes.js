@@ -31,9 +31,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         !telefonoCliente ||
         !passwordCliente
       ) {
-        const error = new Error('Faltan datos');
-        error.status = 400;
-        throw error;
+        return res.status(400).json({ message: 'Faltan datos' });
       }
 
       // Hasheamos la contraseña antes de guardarla
@@ -52,17 +50,19 @@ module.exports = (db, bcrypt, saltRounds) => {
   });
 
   // Ruta de login
-  router.post('/login', async (req, res) => {
+  router.post('/login', async (req, res, next) => {
     const { emailCliente, passwordCliente } = req.body;
 
     if (!emailCliente || !passwordCliente) {
-      return res.status(400).send('Faltan datos de inicio de sesión');
+      return res
+        .status(400)
+        .json({ message: 'Faltan datos de inicio de sesión' });
     }
 
     try {
       const user = await service.getClientByEmail(emailCliente);
       if (!user) {
-        return res.status(404).send('Usuario no encontrado');
+        return res.status(404).json({ message: 'Usuario no encontrado' });
       }
 
       // Validar la contraseña
@@ -71,7 +71,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         user.passwordCliente
       );
       if (!isMatch) {
-        return res.status(401).send('Contraseña incorrecta');
+        return res.status(401).json({ message: 'Contraseña incorrecta' });
       }
 
       // Aquí podrías generar un token JWT si estás usando autenticación basada en tokens
@@ -80,8 +80,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         nombreCliente: user.nombreCliente,
       });
     } catch (error) {
-      console.error('Error al validar el login:', error);
-      res.status(500).send('Error al validar el login');
+      next(error);
     }
   });
 

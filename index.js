@@ -20,8 +20,8 @@ async function main() {
   while (retries < maxRetries) {
     try {
       const db = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
+        host: '192.168.1.14', // Cambiar por la IP de tu máquina
+        user: 'admin', // Cambiar por tu usuario
         password: '',
         database: 'monettest',
       });

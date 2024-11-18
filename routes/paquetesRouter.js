@@ -62,6 +62,32 @@ module.exports = (db) => {
     }
   });
 
+  // Ruta para obtener todos los paquetes de un usuario (por clienteId)
+  router.get('/:clienteId', async (req, res) => {
+    const { clienteId } = req.params;
+
+    try {
+      // Llamamos al servicio para obtener los paquetes
+      const paquetes = await service.obtenerPaquetesPorCliente(clienteId);
+
+      if (!paquetes || paquetes.length === 0) {
+        return res
+          .status(404)
+          .json({ message: 'No se encontraron paquetes para este usuario.' });
+      }
+
+      res.json(paquetes);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({
+          message: 'Error al consultar los paquetes del usuario.',
+          error,
+        });
+    }
+  });
+
   // Consultar el estado de una solicitud
   router.get('/estado/:clientePaqueteId', async (req, res) => {
     const { clientePaqueteId } = req.params;

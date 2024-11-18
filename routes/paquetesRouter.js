@@ -5,6 +5,17 @@ const paqueteService = require('../services/paquetesService');
 module.exports = (db) => {
   const service = new paqueteService(db); // Pasamos db al servicio
 
+  // Obtener todos los paquetes
+  router.get('/', async (req, res) => {
+    try {
+      const result = await service.getAll();
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al obtener los paquetes.' });
+    }
+  }); // Cierre de la ruta
+
   // Comprar un paquete
   router.post('/comprar', async (req, res) => {
     const { clienteId, paqueteId } = req.body;

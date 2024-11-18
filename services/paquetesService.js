@@ -55,6 +55,16 @@ class PaquetesService {
     this.db = db;
   }
 
+  async getAll() {
+    try {
+      const [rows] = await this.db.query('SELECT * FROM paquetes');
+      return rows;
+    } catch (error) {
+      console.error('Error al obtener los paquetes:', error);
+      throw error;
+    }
+  }
+
   // Crear una nueva solicitud de paquete
   async crearSolicitud(clienteId, paqueteId) {
     const query = `

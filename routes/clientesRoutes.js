@@ -23,6 +23,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         telefonoCliente,
         passwordCliente,
         bloqueoPagoCaja = false,
+        admon = false, // Nuevo parámetro
       } = req.body;
 
       if (
@@ -42,6 +43,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         telefonoCliente,
         passwordCliente: hashedPassword,
         bloqueoPagoCaja,
+        admon, // Pasar el nuevo campo
       });
       res.json(result);
     } catch (error) {
@@ -78,6 +80,7 @@ module.exports = (db, bcrypt, saltRounds) => {
       res.status(200).json({
         message: 'Inicio de sesión exitoso',
         nombreCliente: user.nombreCliente,
+        clienteId: user.clienteId,
       });
     } catch (error) {
       next(error);

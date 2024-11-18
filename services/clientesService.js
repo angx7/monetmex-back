@@ -33,26 +33,29 @@ class ClientService {
     telefonoCliente,
     passwordCliente,
     bloqueoPagoCaja,
+    admon = false, // Nuevo parámetro con valor predeterminado
   }) {
     try {
       // Verifica si el correo ya existe
       const existingClient = await this.getClientByEmail(emailCliente);
       if (existingClient) {
-        // Si el cliente ya existe, lanza un error con un mensaje personalizado
         const error = new Error('El correo electrónico ya está registrado');
         error.status = 400;
         throw error;
       }
 
-      // Si no existe, inserta el nuevo cliente
+      // Inserta el nuevo cliente
       const [result] = await this.db.query(
-        'INSERT INTO clientes (nombreCliente, emailCliente, telefonoCliente, passwordCliente, bloqueoPagoCaja) VALUES (?, ?, ?, ?, ?)',
+        `INSERT INTO clientes
+      (nombreCliente, emailCliente, telefonoCliente, passwordCliente, bloqueoPagoCaja, admon)
+      VALUES (?, ?, ?, ?, ?, ?)`,
         [
           nombreCliente,
           emailCliente,
           telefonoCliente,
           passwordCliente,
           bloqueoPagoCaja,
+          admon, // Incluye el nuevo campo
         ]
       );
       return {
@@ -60,6 +63,7 @@ class ClientService {
         nombreCliente,
         emailCliente,
         telefonoCliente,
+        admon, // Devuelve el estado de admon
       };
     } catch (error) {
       console.error('Error al agregar cliente:', error);

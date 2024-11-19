@@ -79,12 +79,10 @@ module.exports = (db) => {
       res.json(paquetes);
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({
-          message: 'Error al consultar los paquetes del usuario.',
-          error,
-        });
+      res.status(500).json({
+        message: 'Error al consultar los paquetes del usuario.',
+        error,
+      });
     }
   });
 

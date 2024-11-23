@@ -81,6 +81,7 @@ module.exports = (db, bcrypt, saltRounds) => {
         message: 'Inicio de sesión exitoso',
         nombreCliente: user.nombreCliente,
         clienteId: user.clienteId,
+        admon: user.admon,
       });
     } catch (error) {
       next(error);

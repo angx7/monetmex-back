@@ -8,7 +8,7 @@ before_script:
   - chmod 600 /tmp/id_rsa
   - ssh-add /tmp/id_rsa
   - mkdir -p ~/.ssh
-  - ssh-keyscan -H monetmexback >> ~/.ssh/known_hosts
+  - ssh-keyscan -H 104.236.112.158 >> ~/.ssh/known_hosts
   - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   - source ~/.nvm/nvm.sh
   - nvm install <version_necesaria>

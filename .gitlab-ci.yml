@@ -3,32 +3,40 @@ stages:
   - deploy
 
 before_script:
+  # Configura la clave SSH para acceder al servidor
   - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d > /tmp/id_rsa
+  - echo "$SSH_PRIVATE_KEY_BASE64" | base64 --decode > /tmp/id_rsa
   - chmod 600 /tmp/id_rsa
   - ssh-add /tmp/id_rsa
   - mkdir -p ~/.ssh
   - ssh-keyscan -H 104.236.112.158 >> ~/.ssh/known_hosts
+
+  # Instalar y usar la versión de Node.js
   - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   - source ~/.nvm/nvm.sh
-  - nvm install <version_necesaria>
-  - nvm use <version_necesaria>
+  - nvm install 20.17.0 # Cambia a la versión que usas localmente
+  - nvm use 20.17.0
 
+# Etapa de build
 build:
   stage: build
   script:
+    # Instala dependencias y compila el proyecto (si es necesario)
+    echo "Instalando dependencias..."
     - npm install
-    - npm run build
+
   artifacts:
     paths:
       - node_modules/
       - dist/
 
+# Etapa de deploy
 deploy:
   stage: deploy
   script:
+    # Copia los archivos al servidor remoto
     - scp -r . root@104.236.112.158:/root/monet/monetmex-back
-    - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && npm run start'
+    # Inicia la aplicación usando PM2
+    - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && pm2 start index.js --name "monetmex-back" && pm2 save'
   only:
     - main
-

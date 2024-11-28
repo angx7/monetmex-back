@@ -21,7 +21,7 @@ async function main() {
     try {
       const db = await mysql.createConnection({
         host: '', // Cambiar por la IP de tu máquina
-        user: 'Admin', // Cambiar por tu usuario
+        user: '', // Cambiar por tu usuario
         password: '',
         database: 'monettest',
       });

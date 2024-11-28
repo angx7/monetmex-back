@@ -27,7 +27,8 @@ build:
 deploy:
   stage: deploy
   script:
-    - scp -r . root@104.236.112.158:monet/monetmex-back
-    - ssh root@104.236.112.158 'cd monet/monetmex-back && npm install && npm run start'
+    - scp -r . root@104.236.112.158:/root/monet/monetmex-back
+    - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && npm run start'
   only:
     - main
+

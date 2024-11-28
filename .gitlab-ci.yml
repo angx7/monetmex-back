@@ -1,0 +1,33 @@
+stages:
+  - build
+  - deploy
+
+before_script:
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY_BASE64" | base64 -d > /tmp/id_rsa
+  - chmod 600 /tmp/id_rsa
+  - ssh-add /tmp/id_rsa
+  - mkdir -p ~/.ssh
+  - ssh-keyscan -H monetmexback >> ~/.ssh/known_hosts
+  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+  - source ~/.nvm/nvm.sh
+  - nvm install <version_necesaria>
+  - nvm use <version_necesaria>
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
+
+deploy:
+  stage: deploy
+  script:
+    - scp -r . root@104.236.112.158:monet/monetmex-back
+    - ssh root@104.236.112.158 'cd monet/monetmex-back && npm install && npm run prod'
+  only:
+    - main

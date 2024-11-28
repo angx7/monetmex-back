@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -16,14 +17,15 @@ async function main() {
   const maxRetries = 5;
   const retryDelay = 5000;
   let retries = 0;
+  console.log('Connecting to database...', process.env.DB_NAME);
 
   while (retries < maxRetries) {
     try {
       const db = await mysql.createConnection({
-        host: '', // Cambiar por la IP de tu máquina
-        user: '', // Cambiar por tu usuario
-        password: '',
-        database: 'monettest',
+        host: process.env.DB_HOST, // Cambiar por la IP de tu máquina
+        user: process.env.DB_USER, // Cambiar por tu usuario
+        password: process.env.DB_PASSWORD, // Cambiar por tu contraseña
+        database: process.env.DB_NAME,
       });
 
       routerApp(app, db, bcrypt, saltRounds);

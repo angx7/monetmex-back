@@ -34,9 +34,14 @@ build:
 deploy:
   stage: deploy
   script:
-    # Copia los archivos al servidor remoto
+    # Copiar los archivos al servidor
     - scp -r . root@104.236.112.158:/root/monet/monetmex-back
-    # Inicia la aplicación usando PM2
+    # Establecer las variables de entorno en el servidor
+    - ssh root@104.236.112.158 'echo "DB_HOST=$DB_HOST" >> /root/.bashrc'
+    - ssh root@104.236.112.158 'echo "DB_USER=$DB_USER" >> /root/.bashrc'
+    - ssh root@104.236.112.158 'echo "DB_PASSWORD=$DB_PASSWORD" >> /root/.bashrc'
+    - ssh root@104.236.112.158 'echo "DB_NAME=$DB_NAME" >> /root/.bashrc'
+    # Iniciar la aplicación
     - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && pm2 start index.js --name "monetmex-back" && pm2 save'
   only:
     - main

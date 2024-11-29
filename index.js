@@ -22,6 +22,7 @@ async function main() {
     try {
       console.log('DB_HOST', process.env.DB_HOST);
       console.log('Connecting to database...', process.env.DB_NAME);
+      console.log('connecting to database...');
       const db = await mysql.createConnection({
         host: process.env.DB_HOST, // Cambiar por la IP de tu máquina
         user: process.env.DB_USER, // Cambiar por tu usuario

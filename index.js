@@ -17,10 +17,11 @@ async function main() {
   const maxRetries = 5;
   const retryDelay = 5000;
   let retries = 0;
-  console.log('Connecting to database...', process.env.DB_NAME);
 
   while (retries < maxRetries) {
     try {
+      console.log('DB_HOST', process.env.DB_HOST);
+      console.log('Connecting to database...', process.env.DB_NAME);
       const db = await mysql.createConnection({
         host: process.env.DB_HOST, // Cambiar por la IP de tu máquina
         user: process.env.DB_USER, // Cambiar por tu usuario

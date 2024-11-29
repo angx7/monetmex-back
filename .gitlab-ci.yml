@@ -41,7 +41,8 @@ deploy:
     - ssh root@104.236.112.158 'echo "DB_USER=$DB_USER" >> /root/.bashrc'
     - ssh root@104.236.112.158 'echo "DB_PASSWORD=$DB_PASSWORD" >> /root/.bashrc'
     - ssh root@104.236.112.158 'echo "DB_NAME=$DB_NAME" >> /root/.bashrc'
-    # Iniciar la aplicación
-    - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && pm2 start index.js --name "monetmex-back" && pm2 save'
+    # Iniciar o reiniciar la aplicación
+    - ssh root@104.236.112.158 'cd /root/monet/monetmex-back && npm install && pm2 restart monetmex-back -f && pm2 save'
   only:
     - main
+

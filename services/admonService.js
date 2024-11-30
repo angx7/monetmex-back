@@ -8,7 +8,7 @@
 //     try {
 //       const query = `
 //       SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.sesionesRestantes
-//       FROM clientesPaquetes cp
+//       FROM clientespaquetes cp
 //       JOIN paquetes p ON cp.paqueteId = p.paqueteId
 //       WHERE cp.estado = 'pendiente'
 //     `;
@@ -40,7 +40,7 @@
 //     try {
 //       // Actualizar solicitudes vencidas (mayores a 24 horas en estado 'pendiente')
 //       const cancelarQuery = `
-//       UPDATE clientesPaquetes
+//       UPDATE clientespaquetes
 //       SET estado = 'cancelado'
 //       WHERE clientePaqueteId = ?
 //         AND estado = 'pendiente'
@@ -54,7 +54,7 @@
 //       // Obtener el estado actualizado de la solicitud
 //       const query = `
 //       SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.sesionesRestantes
-//       FROM clientesPaquetes cp
+//       FROM clientespaquetes cp
 //       JOIN paquetes p ON cp.paqueteId = p.paqueteId
 //       WHERE clientePaqueteId = ?
 //     `;
@@ -89,9 +89,9 @@
 //       // Consulta para obtener la duración del paquete
 //       const getPackageQuery = `
 //       SELECT paquetes.duracionDias
-//       FROM clientesPaquetes
-//       JOIN paquetes ON clientesPaquetes.paqueteId = paquetes.paqueteId
-//       WHERE clientesPaquetes.clientePaqueteId = ? AND clientesPaquetes.estado = 'pendiente'
+//       FROM clientespaquetes
+//       JOIN paquetes ON clientespaquetes.paqueteId = paquetes.paqueteId
+//       WHERE clientespaquetes.clientePaqueteId = ? AND clientespaquetes.estado = 'pendiente'
 //     `;
 //       const [rows] = await this.db.execute(getPackageQuery, [clientePaqueteId]);
 
@@ -106,7 +106,7 @@
 
 //       // Actualizar el estado a "aprobado", la fecha de aprobación y calcular la fecha de expiración
 //       const updateQuery = `
-//       UPDATE clientesPaquetes
+//       UPDATE clientespaquetes
 //       SET estado = 'aprobado',
 //           fechaAprobacion = NOW(),
 //           fechaExpiracion = DATE_ADD(NOW(), INTERVAL ? DAY)
@@ -127,7 +127,7 @@
 //       // Obtener el estado actualizado de la solicitud
 //       const selectQuery = `
 //       SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.fechaAprobacion, cp.fechaExpiracion, cp.sesionesRestantes
-//       FROM clientesPaquetes cp
+//       FROM clientespaquetes cp
 //       JOIN paquetes p ON cp.paqueteId = p.paqueteId
 //       WHERE clientePaqueteId = ?
 //     `;
@@ -174,7 +174,7 @@ class admonService {
     try {
       const query = `
         SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.sesionesRestantes
-        FROM clientesPaquetes cp
+        FROM clientespaquetes cp
         JOIN paquetes p ON cp.paqueteId = p.paqueteId
         WHERE cp.estado = 'pendiente'
       `;
@@ -233,7 +233,7 @@ class admonService {
   async consultarEstado(clientePaqueteId) {
     try {
       const cancelarQuery = `
-        UPDATE clientesPaquetes
+        UPDATE clientespaquetes
         SET estado = 'cancelado'
         WHERE clientePaqueteId = ? AND estado = 'pendiente'
         AND TIMESTAMPDIFF(HOUR, fechaCreacion, NOW()) >= 24
@@ -245,7 +245,7 @@ class admonService {
 
       const query = `
         SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.sesionesRestantes
-        FROM clientesPaquetes cp
+        FROM clientespaquetes cp
         JOIN paquetes p ON cp.paqueteId = p.paqueteId
         WHERE clientePaqueteId = ?
       `;
@@ -274,9 +274,9 @@ class admonService {
     try {
       const getPackageQuery = `
         SELECT paquetes.duracionDias
-        FROM clientesPaquetes
-        JOIN paquetes ON clientesPaquetes.paqueteId = paquetes.paqueteId
-        WHERE clientesPaquetes.clientePaqueteId = ? AND clientesPaquetes.estado = 'pendiente'
+        FROM clientespaquetes
+        JOIN paquetes ON clientespaquetes.paqueteId = paquetes.paqueteId
+        WHERE clientespaquetes.clientePaqueteId = ? AND clientespaquetes.estado = 'pendiente'
       `;
       const [rows] = await this.db.execute(getPackageQuery, [clientePaqueteId]);
 
@@ -289,7 +289,7 @@ class admonService {
 
       const duracionDias = rows[0].duracionDias;
       const updateQuery = `
-        UPDATE clientesPaquetes
+        UPDATE clientespaquetes
         SET estado = 'aprobado', fechaAprobacion = NOW(), fechaExpiracion = DATE_ADD(NOW(), INTERVAL ? DAY)
         WHERE clientePaqueteId = ?
       `;
@@ -307,7 +307,7 @@ class admonService {
 
       const selectQuery = `
         SELECT cp.clientePaqueteId, p.nombrePaquete, cp.estado, cp.fechaCreacion, cp.fechaAprobacion, cp.fechaExpiracion, cp.sesionesRestantes
-        FROM clientesPaquetes cp
+        FROM clientespaquetes cp
         JOIN paquetes p ON cp.paqueteId = p.paqueteId
         WHERE clientePaqueteId = ?
       `;
@@ -394,7 +394,7 @@ class admonService {
   async cancelarSolicitudesVencidas() {
     try {
       const query = `
-        UPDATE clientesPaquetes
+        UPDATE clientespaquetes
         SET estado = 'cancelado'
         WHERE estado = 'pendiente'
         AND TIMESTAMPDIFF(HOUR, fechaCreacion, NOW()) >= 24

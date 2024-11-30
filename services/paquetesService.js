@@ -6,7 +6,7 @@
 //   // Crear una nueva solicitud de paquete
 //   async crearSolicitud(clienteId, paqueteId) {
 //     const query = `
-//       INSERT INTO clientesPaquetes (clienteId, paqueteId, estado)
+//       INSERT INTO clientespaquetes (clienteId, paqueteId, estado)
 //       VALUES (?, ?, 'pendiente')
 //     `;
 //     const [result] = await this.db.execute(query, [clienteId, paqueteId]);
@@ -16,7 +16,7 @@
 //   // Aprobar una solicitud existente
 //   async aprobarSolicitud(id) {
 //     const query = `
-//       UPDATE clientesPaquetes
+//       UPDATE clientespaquetes
 //       SET estado = 'aprobado', fechaAprobacion = NOW()
 //       WHERE clientePaqueteId = ? AND estado = 'pendiente'
 //     `;
@@ -28,7 +28,7 @@
 //   async consultarEstado(clienteId, paqueteId) {
 //     // Actualizar solicitudes vencidas
 //     const cancelarQuery = `
-//       UPDATE clientesPaquetes
+//       UPDATE clientespaquetes
 //       SET estado = 'cancelado'
 //       WHERE clienteId = ? AND paqueteId = ?
 //         AND estado = 'pendiente'
@@ -39,7 +39,7 @@
 //     // Obtener el estado actualizado
 //     const query = `
 //       SELECT estado, fecha_aprobacion, fecha_creacion
-//       FROM clientesPaquetes
+//       FROM clientespaquetes
 //       WHERE clienteId = ? AND paqueteId = ?
 //     `;
 //     const [rows] = await this.db.execute(query, [clienteId, paqueteId]);
@@ -68,7 +68,7 @@ class PaquetesService {
   // Crear una nueva solicitud de paquete
   async crearSolicitud(clienteId, paqueteId) {
     const query = `
-    INSERT INTO clientesPaquetes (clienteId, paqueteId, estado, sesionesRestantes, fechaCreacion)
+    INSERT INTO clientespaquetes (clienteId, paqueteId, estado, sesionesRestantes, fechaCreacion)
     SELECT ?, ?, 'pendiente', paquetes.cantidadDeSesiones, NOW()
     FROM paquetes
     WHERE paquetes.paqueteId = ?
@@ -86,9 +86,9 @@ class PaquetesService {
     // Consulta para obtener la duración del paquete
     const getPackageQuery = `
     SELECT paquetes.duracionDias
-    FROM clientesPaquetes
-    JOIN paquetes ON clientesPaquetes.paqueteId = paquetes.paqueteId
-    WHERE clientesPaquetes.clientePaqueteId = ? AND clientesPaquetes.estado = 'pendiente'
+    FROM clientespaquetes
+    JOIN paquetes ON clientespaquetes.paqueteId = paquetes.paqueteId
+    WHERE clientespaquetes.clientePaqueteId = ? AND clientespaquetes.estado = 'pendiente'
   `;
     const [rows] = await this.db.execute(getPackageQuery, [id]);
 
@@ -100,7 +100,7 @@ class PaquetesService {
 
     // Actualizar el estado a "aprobado", la fecha de aprobación y calcular la fecha de expiración
     const updateQuery = `
-    UPDATE clientesPaquetes
+    UPDATE clientespaquetes
     SET estado = 'aprobado',
         fechaAprobacion = NOW(),
         fechaExpiracion = DATE_ADD(NOW(), INTERVAL ? DAY)
@@ -116,7 +116,7 @@ class PaquetesService {
     try {
       // Actualizar solicitudes vencidas
       const cancelarQuery = `
-      UPDATE clientesPaquetes
+      UPDATE clientespaquetes
       SET estado = 'cancelado'
       WHERE clientePaqueteId = ?
         AND estado = 'pendiente'
@@ -130,7 +130,7 @@ class PaquetesService {
       // Obtener el estado actualizado
       const query = `
       SELECT estado, fechaAprobacion, fechaExpiracion, fechaCreacion, sesionesRestantes
-      FROM clientesPaquetes
+      FROM clientespaquetes
       WHERE clientePaqueteId = ?
     `;
       const [rows] = await this.db.execute(query, [clientePaqueteId]);
@@ -155,7 +155,7 @@ class PaquetesService {
         cp.sesionesRestantes,
         cp.fechaAprobacion,
         cp.fechaExpiracion
-      FROM clientesPaquetes cp
+      FROM clientespaquetes cp
       JOIN paquetes p ON cp.paqueteId = p.paqueteId
       WHERE cp.clienteId = ?
     `;

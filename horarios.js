@@ -47,7 +47,7 @@ async function insertarHorarios() {
   const connection = await mysql.createConnection(dbConfig);
 
   try {
-    const year = 2024; // Año para generar los horarios
+    const year = 2025; // Año para generar los horarios
 
     // 1. Obtener los datos de las tablas 'clases' y 'clasehorarios'
     const [clases] = await connection.execute(

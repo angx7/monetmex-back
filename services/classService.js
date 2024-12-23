@@ -104,7 +104,7 @@ class classService {
     const queryUpdate = `
     UPDATE horarios
     SET lugaresDisponibles = lugaresDisponibles - 1
-    WHERE fecha = ? AND claseId = ?
+    WHERE fecha = ? AND id = ?
     `;
 
     try {

@@ -7,10 +7,11 @@ module.exports = (db) => {
 
   // Ruta de reserva
   router.post('/reserve', async (req, res, next) => {
-    const { idClase, idCliente, metodoPago, paqueteId, fecha } = req.body;
+    const { idClase, idCliente, metodoPago, paqueteId, fecha, schedule } =
+      req.body;
 
     // Validación de datos necesarios
-    if (!idClase || !idCliente || !metodoPago || !fecha) {
+    if (!idClase || !idCliente || !metodoPago || !fecha || !schedule) {
       return res.status(400).json({
         message: 'Faltan datos: idClase, idCliente, metodoPago o fecha',
       });
@@ -24,6 +25,7 @@ module.exports = (db) => {
         metodoPago,
         paqueteId,
         fecha,
+        schedule,
       });
 
       // Si la reserva fue exitosa, retornamos el resultado

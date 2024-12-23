@@ -15,7 +15,14 @@ class classService {
   }
 
   // Función para realizar la reserva
-  async reserveClass({ claseId, clienteId, metodoPago, paqueteId, fecha }) {
+  async reserveClass({
+    claseId,
+    clienteId,
+    metodoPago,
+    paqueteId,
+    fecha,
+    schedule,
+  }) {
     // Verificar si el usuario ya tiene una reserva para el mismo día
     const queryReservaExistente = `
     SELECT COUNT(*) AS count
@@ -97,7 +104,7 @@ class classService {
     const queryUpdate = `
     UPDATE horarios
     SET lugaresDisponibles = lugaresDisponibles - 1
-    WHERE fecha = ?
+    WHERE fecha = ? AND claseId = ?
     `;
 
     try {
@@ -115,7 +122,7 @@ class classService {
       ]);
 
       // Actualizar los lugares disponibles en la tabla horarios
-      await this.db.query(queryUpdate, [fecha]);
+      await this.db.query(queryUpdate, [fecha, schedule]);
 
       // Confirmar la transacción
       // await this.db.commit();

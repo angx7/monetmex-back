@@ -186,6 +186,30 @@ class ClientService {
       throw error;
     }
   }
+
+  async getNextClass(clienteId) {
+    try {
+      const [clase] = await this.db.query(
+        `SELECT clases.disciplina, horarios.fecha, horarios.horaInicio, horarios.horaFin
+        FROM asistencia
+        JOIN horarios ON asistencia.claseId = horarios.claseId AND asistencia.fecha = horarios.fecha
+        JOIN clases ON asistencia.claseId = clases.claseId
+        WHERE asistencia.clienteId = ?
+        ORDER BY horarios.fecha ASC
+        LIMIT 1`,
+        [clienteId]
+      );
+
+      if (!clase.length) {
+        return { message: 'No hay clases próximas' };
+      }
+
+      return clase[0];
+    } catch (error) {
+      console.error('Error al obtener la próxima clase:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = ClientService;

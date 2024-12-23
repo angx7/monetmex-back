@@ -104,5 +104,20 @@ module.exports = (db, bcrypt, saltRounds) => {
     }
   });
 
+  // Ruta para obtener la proxima clase de un cliente
+  router.get('/nextclass', async (req, res, next) => {
+    const { clienteId } = req.query;
+
+    if (!clienteId) {
+      return res.status(400).json({ message: 'Falta el ID del cliente' });
+    }
+
+    try {
+      const result = await service.getNextClass(clienteId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  });
   return router;
 };

@@ -3,35 +3,6 @@ class classService {
     this.db = db;
   }
 
-  // Función para calcular el próximo día según el día de la semana
-  getNextDay(date, diaSemana) {
-    const dayNames = [
-      'Domingo',
-      'Lunes',
-      'Martes',
-      'Miercoles',
-      'Jueves',
-      'Viernes',
-      'Sabado',
-    ];
-
-    const today = new Date(date);
-    const currentDay = today.getDay(); // 0 es Domingo, 1 es Lunes, etc.
-
-    // Obtener el índice del día de la semana solicitado
-    const targetDay = dayNames.indexOf(diaSemana);
-
-    if (targetDay === -1) {
-      throw new Error('Día de la semana inválido: ' + diaSemana);
-    }
-
-    // Calcular la diferencia en días para el próximo día solicitado
-    const daysToTarget = (targetDay - currentDay + 7) % 7; // Si el día es el mismo, devuelve 0
-    today.setDate(today.getDate() + daysToTarget);
-
-    return today;
-  }
-
   async getBloqueoPagoCaja(clienteId) {
     try {
       const query = 'SELECT bloqueoPagoCaja FROM clientes WHERE clienteId = ?';
@@ -44,12 +15,20 @@ class classService {
   }
 
   // Función para realizar la reserva
-  async reserveClass({ claseId, clienteId, metodoPago, paqueteId, diaSemana }) {
-    const today = new Date();
-
-    // Calculamos el próximo día de la semana
-    const nextDay = this.getNextDay(today, diaSemana); // Se pasa diaSemana desde el frontend
-    const formattedDate = nextDay.toISOString().split('T')[0]; // YYYY-MM-DD
+  async reserveClass({ claseId, clienteId, metodoPago, paqueteId, fecha }) {
+    // Verificar si el usuario ya tiene una reserva para el mismo día
+    const queryReservaExistente = `
+    SELECT COUNT(*) AS count
+    FROM asistencia
+    WHERE clienteId = ? AND fecha = ?
+    `;
+    const [rowsReservaExistente] = await this.db.query(queryReservaExistente, [
+      clienteId,
+      fecha,
+    ]);
+    if (rowsReservaExistente[0].count > 0) {
+      throw new Error('El cliente ya tiene una reserva para este día');
+    }
 
     // Verificar si el pago es en "Caja" y el cliente puede pagar en caja
     let estadoPago = ''; // Definimos la variable estadoPago aquí
@@ -101,9 +80,9 @@ class classService {
     const queryLugares = `
     SELECT lugaresDisponibles
     FROM horarios
-    WHERE id = ?
+    WHERE fecha = ?
   `;
-    const [rowsLugares] = await this.db.query(queryLugares, [claseId]);
+    const [rowsLugares] = await this.db.query(queryLugares, [fecha]);
     const lugaresDisponibles = rowsLugares[0].lugaresDisponibles;
     if (lugaresDisponibles === 0) {
       throw new Error('No hay lugares disponibles en esta clase');
@@ -118,7 +97,7 @@ class classService {
     const queryUpdate = `
     UPDATE horarios
     SET lugaresDisponibles = lugaresDisponibles - 1
-    WHERE id = ?
+    WHERE fecha = ?
     `;
 
     try {
@@ -129,14 +108,14 @@ class classService {
       const [result] = await this.db.query(queryInsert, [
         claseId,
         clienteId,
-        formattedDate,
+        fecha,
         metodoPago,
         estadoPago,
         paqueteId,
       ]);
 
       // Actualizar los lugares disponibles en la tabla horarios
-      await this.db.query(queryUpdate, [claseId]);
+      await this.db.query(queryUpdate, [fecha]);
 
       // Confirmar la transacción
       // await this.db.commit();
@@ -178,11 +157,11 @@ class classService {
     }
   }
 
-  async getClassesByDay(diaSemana) {
+  async getClassesByDay(fecha) {
     try {
       const [rows] = await this.db.query(
-        `SELECT * FROM horarios WHERE diaSemana = ?`,
-        [diaSemana]
+        `SELECT * FROM horarios WHERE fecha = ?`,
+        [fecha]
       );
       return rows;
     } catch (error) {
@@ -192,7 +171,7 @@ class classService {
   }
 
   // Método para obtener horarios por día de la semana y disciplina
-  async getHorariosByDayAndDisciplina(diaSemana, disciplina) {
+  async getHorariosByDayAndDisciplina(fecha, disciplina) {
     try {
       const query = `
         SELECT
@@ -205,10 +184,10 @@ class classService {
         INNER JOIN
             clases c ON h.claseId = c.claseId
         WHERE
-            h.diaSemana = ? AND
+            h.fecha = ? AND
             c.disciplina LIKE ?;
       `;
-      const [rows] = await this.db.query(query, [diaSemana, `%${disciplina}%`]);
+      const [rows] = await this.db.query(query, [fecha, `%${disciplina}%`]);
       return rows;
     } catch (error) {
       console.error('Error al obtener los horarios:', error);

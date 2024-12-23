@@ -88,5 +88,21 @@ module.exports = (db, bcrypt, saltRounds) => {
     }
   });
 
+  // Ruta para cancelar una clase
+  router.post('/cancelar', async (req, res, next) => {
+    const { claseId, clienteId, fecha } = req.body;
+
+    if (!claseId || !clienteId || !fecha) {
+      return res.status(400).json({ message: 'Faltan datos' });
+    }
+
+    try {
+      const result = await service.cancelarClase(clienteId, claseId, fecha);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   return router;
 };

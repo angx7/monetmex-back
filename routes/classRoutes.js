@@ -7,12 +7,12 @@ module.exports = (db) => {
 
   // Ruta de reserva
   router.post('/reserve', async (req, res, next) => {
-    const { idClase, idCliente, metodoPago, paqueteId, diaSemana } = req.body;
+    const { idClase, idCliente, metodoPago, paqueteId, fecha } = req.body;
 
     // Validación de datos necesarios
-    if (!idClase || !idCliente || !metodoPago || !diaSemana) {
+    if (!idClase || !idCliente || !metodoPago || !fecha) {
       return res.status(400).json({
-        message: 'Faltan datos: idClase, idCliente, metodoPago o diaSemana',
+        message: 'Faltan datos: idClase, idCliente, metodoPago o fecha',
       });
     }
 
@@ -23,7 +23,7 @@ module.exports = (db) => {
         clienteId: idCliente,
         metodoPago,
         paqueteId,
-        diaSemana,
+        fecha,
       });
 
       // Si la reserva fue exitosa, retornamos el resultado
@@ -68,14 +68,14 @@ module.exports = (db) => {
   // Ruta para obtener horarios de clases por día
 
   router.get('/availability', async (req, res, next) => {
-    const { diaSemana } = req.query;
+    const { fecha } = req.query;
 
-    if (!diaSemana) {
-      return res.status(400).json({ message: 'Falta el día de la semana' });
+    if (!fecha) {
+      return res.status(400).json({ message: 'Falta la fecha' });
     }
 
     try {
-      const result = await service.getClassesByDay(diaSemana);
+      const result = await service.getClassesByDay(fecha);
       if (!result || result.length === 0) {
         return res.status(404).json({ message: 'No se encontraron clases' });
       }
@@ -89,17 +89,17 @@ module.exports = (db) => {
 
   // Ruta para obtener horarios por día de la semana y disciplina
   router.get('/horarios', async (req, res, next) => {
-    const { diaSemana, disciplina } = req.query;
+    const { fecha, disciplina } = req.query;
 
-    if (!diaSemana || !disciplina) {
+    if (!fecha || !disciplina) {
       return res
         .status(400)
-        .json({ message: 'Faltan datos: diaSemana o disciplina' });
+        .json({ message: 'Faltan datos: fecha o disciplina' });
     }
 
     try {
       const result = await service.getHorariosByDayAndDisciplina(
-        diaSemana,
+        fecha,
         disciplina
       );
       res.json(result);

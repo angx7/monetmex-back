@@ -36,6 +36,10 @@ module.exports = (db) => {
         error.message === 'El cliente no puede pagar en caja debido a bloqueo'
       ) {
         return res.status(403).json({ message: error.message });
+      } else if (
+        error.message === 'El cliente ya tiene una reserva para este día'
+      ) {
+        return res.status(403).json({ message: error.message });
       }
 
       // Si ocurre cualquier otro error, lo pasamos al siguiente middleware

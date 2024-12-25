@@ -80,7 +80,7 @@ class classService {
       WHERE clienteId = ? AND paqueteId = ?
       `;
       await this.db.query(updateSesiones, [clienteId, paqueteId]);
-      metodoPago = 'Paquete';
+      metodoPago = 'Digital';
     }
 
     // revisar si hay lugares disponibles

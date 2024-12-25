@@ -116,6 +116,9 @@ module.exports = (db, bcrypt, saltRounds) => {
       const result = await service.getNextClass(clienteId);
       res.json(result);
     } catch (error) {
+      if (error.message === 'Cliente no encontrado') {
+        return res.status(404).json({ message: error.message });
+      }
       next(error);
     }
   });

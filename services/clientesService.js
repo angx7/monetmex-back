@@ -73,6 +73,17 @@ class ClientService {
 
   async cancelarClase(clienteId, claseId, fecha) {
     try {
+      // Verificar si la clase existe
+      const [existingClass] = await this.db.query(
+        'SELECT * FROM asistencia WHERE clienteId = ? AND claseId = ? AND fecha = ?',
+        [clienteId, claseId, fecha]
+      );
+
+      if (!existingClass.length) {
+        throw new Error(
+          'La clase no existe o no está registrada para el cliente'
+        );
+      }
       // Verificar que el metodoPago sea diferente de "Caja"
       const [metodoPago] = await this.db.query(
         'SELECT metodoPago FROM asistencia WHERE clienteId = ? AND claseId = ? AND fecha = ?',
@@ -189,6 +200,14 @@ class ClientService {
 
   async getNextClass(clienteId) {
     try {
+      const [user] = await this.db.query(
+        'SELECT * FROM clientes WHERE clienteId = ?',
+        [clienteId]
+      );
+
+      if (!user.length) {
+        throw new Error('Cliente no encontrado');
+      }
       const [clase] = await this.db.query(
         `SELECT clases.disciplina, horarios.fecha, horarios.horaInicio, horarios.horaFin
         FROM asistencia
